@@ -4,6 +4,34 @@
    Domain: rover.novax.my.id
    ========================================================================== */
 
+/* Local Self-Hosted Fonts (Zero FOUT, Instant Offline Load) */
+@font-face {
+    font-family: 'Oswald';
+    font-style: normal;
+    font-weight: 200 700;
+    font-display: swap;
+    src: url('/fonts/oswald-latin-variable.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Rethink Sans';
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url('/fonts/rethinksans-latin-variable.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Rethink Sans';
+    font-style: italic;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url('/fonts/rethinksans-latin-italic-variable.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
     /* Colors */
     --color-sunlit-cream: #f2ee98;
@@ -316,6 +344,16 @@ a:hover {
     opacity: 1;
 }
 
+.pill-btn-ink:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 0 var(--color-forest-ink);
+}
+
+.pill-btn:focus-visible {
+    outline: 2.5px solid var(--color-forest-ink);
+    outline-offset: 2.5px;
+}
+
 /* Main Wrapper */
 .main-wrapper {
     flex: 1;
@@ -544,6 +582,100 @@ a:hover {
     font-weight: var(--weight-semibold);
 }
 
+/* Input Error & Animation States */
+.clean-input.has-error {
+    border-color: #b91c1c;
+    background-color: #fff9f9;
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.22);
+}
+
+.clean-input.shake-anim {
+    animation: roverShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Spotlight Form Alert */
+.spotlight-alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--color-parchment);
+    color: var(--color-forest-ink);
+    border: 2px solid var(--color-forest-ink);
+    border-radius: 18px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    box-shadow: 3px 3px 0 0 var(--color-forest-ink);
+    animation: alertPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.spotlight-alert[hidden] {
+    display: none !important;
+}
+
+.spotlight-alert-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b91c1c;
+    flex-shrink: 0;
+}
+
+.spotlight-alert-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.spotlight-alert-badge {
+    background-color: var(--color-marigold);
+    color: var(--color-forest-ink);
+    border: 1.5px solid var(--color-forest-ink);
+    border-radius: var(--radius-pill);
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: var(--weight-extrabold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.spotlight-alert-message {
+    font-size: 0.95rem;
+    font-weight: var(--weight-bold);
+    color: var(--color-forest-ink);
+    line-height: 1.4;
+}
+
+.spotlight-alert-close {
+    background: transparent;
+    border: 1.5px solid var(--color-forest-ink);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: var(--weight-extrabold);
+    color: var(--color-forest-ink);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.spotlight-alert-close:hover {
+    background-color: var(--color-marigold);
+    transform: scale(1.1);
+}
+
+.spotlight-alert-close:focus-visible {
+    outline: 2px solid var(--color-forest-ink);
+    outline-offset: 2px;
+}
+
 /* Launch Spotlight CTA */
 .btn-launch-spotlight {
     width: 100%;
@@ -562,18 +694,35 @@ a:hover {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease, background-color 0.15s ease;
     margin-top: 4px;
+    position: relative;
+    user-select: none;
 }
 
 .btn-launch-spotlight:hover {
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 0 var(--color-forest-ink);
+    background-color: #ffe833;
 }
 
 .btn-launch-spotlight:active {
     transform: translate(2px, 2px);
     box-shadow: 2px 2px 0 0 var(--color-forest-ink);
+}
+
+.btn-launch-spotlight:focus-visible {
+    outline: 3px solid var(--color-forest-ink);
+    outline-offset: 3px;
+}
+
+.btn-launch-spotlight svg {
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    flex-shrink: 0;
+}
+
+.btn-launch-spotlight:hover svg {
+    transform: translateX(6px);
 }
 
 .spotlight-chips {
@@ -1165,6 +1314,17 @@ a:hover {
         left: 14px;
     }
 
+    .spotlight-alert {
+        padding: 10px 14px;
+        gap: 8px;
+        border-radius: 14px;
+        margin-bottom: 16px;
+    }
+
+    .spotlight-alert-message {
+        font-size: 0.85rem;
+    }
+
     .btn-launch-spotlight {
         font-size: 1.3rem;
         padding: 14px 20px;
@@ -1243,5 +1403,40 @@ a:hover {
 
     .card-title {
         font-size: 1.35rem;
+    }
+}
+
+/* ==========================================================================
+   Subtle & Tasteful Animations
+   ========================================================================== */
+
+@keyframes roverShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    15%, 55%, 85% {
+        transform: translateX(-5px);
+    }
+    35%, 75% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes alertPop {
+    0% {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
     }
 }
