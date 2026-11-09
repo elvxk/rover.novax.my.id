@@ -1,10 +1,15 @@
+# Deny access to sensitive files and dotfiles
+<FilesMatch "^\.|\.(md|json|yml|yaml|ini|log|sh)$|config\.php">
+    Require all denied
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
 
-    # Serve existing static files directly
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
+    # Serve existing static assets directly (css, images, fonts, icons)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ [NC]
     RewriteRule ^ - [L]
 
     # Route all proxy requests to index.php

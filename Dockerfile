@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libonig-dev \
     && docker-php-ext-install curl dom mbstring \
     && a2enmod rewrite \
+    && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure Apache VirtualHost with AllowOverride All and FallbackResource
