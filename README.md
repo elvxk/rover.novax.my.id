@@ -1,33 +1,55 @@
-# preview
-Web based HTTP proxy to preview sites before DNS changes
+# Rover of Nova-X
 
-## Features
-The proxy server makes the connection to the server on your behalf:
+> Sunlit retro botanical HTTP preview proxy for site migrations and DNS propagation testing.  
+> Running on **[rover.novax.my.id](https://rover.novax.my.id)**
 
-* You don't have to change your hosts file
-* URLs on your site are redirected to this proxy server
-* If you browse away from the test site to a live site, then you are redirected to that site
-* HTTP basic authentication works
-* Cookies work, but might be a little weird (promiscuous)
+Rover of Nova-X allows you to test websites and server migrations directly against their destination server IP without modifying `/etc/hosts` or waiting for worldwide DNS propagation.
 
-## Limitations
-A few things are not supported:
+---
 
-* This proxy does not support partial loading: you have to wait for the proxy to get the whole page and ajust the links before it sends it back to you.
-* You can expect it to be slow, because HTML pages are decomposed and rewritten, by PHP, an interpreted language..
-* Javascript-heavy and flash sites tend to end up loading the "real" site, since host names and IP addresses in scripts are generally not rewritten.
-* Meta refresh requests with an absolute URL are not rewritten.
-* Non-HTTP protocols, and HTTP on ports other than port 80 are not supported (most of these are not name based virtual hosts anyhow, so you can browse to them directly). Lately https on port 443 is vaguely supported, although without any trace of SSL certificate verification, which makes it just a little bit worse than useless, and it has not been tested with SNI.
+## Key Features
 
-If your new site and your old site are identical, you should use a browser plugin to show which URLs you are visiting (e.g. firebug for firefox, which is now defunct).
+Rover connects directly to the destination server IP with the spoofed HTTP `Host:` header on your behalf:
 
-## Bugs
-Yep, there's bugs, there are, and not just in the grammar of this sentence. If you see one, don't panic - your site probably looks fine!
+* **Zero `/etc/hosts` Editing:** Preview staging and new server builds from any device or browser without administrative privileges.
+* **On-The-Fly Link Rewriting:** Internal HTML links (`<a href>`, `<img src>`, `<link href>`, `<script src>`, inline styles, and form actions) are automatically rewritten to route through the proxy tunnel.
+* **Interactive Preview Toast:** Injects a lightweight botanical status banner (`preview.html`) indicating the previewed host, target IP, rewritten link count, and execution time.
+* **Cookie & Session Forwarding:** Supports cookies and session handling across requests.
+* **HTTP Form Submissions:** POST requests and multipart file uploads are proxied to the target server.
+* **RFC1918 Protection:** Built-in blacklist protects against accidental internal subnet bridging.
 
-*  Error handling is pretty much non-existent - expect blank pages.
-*  The proxy can confuse character set encodings, and leave strange droppings like Â in your output (especially when running on CentOS 5.x).
-*  This proxy should not be used for security sensitive work, since different sites are rewritten into a single domain. Also, there's no encryption.
-*  The HTTP referer header is not handled consistently.
-*  Links to foreign sites may be rejected by the server of the IP address you give: the software is too dumb to figure out whether you want the real fbcdn.com or the fbcdn.com at the IP address you supplied.
-*  This service is supplied as-is without any guarantee as to whether it works, etc. Any assumptions you make about its manner of operation are entirely your own.
- 
+---
+
+## Visual Design Reference
+
+Designed according to **`DESIGN.md`** — *Sunlit Retro Botanical Almanac*:
+* **Palette:** Sunlit Cream (`#f2ee98`), Forest Ink (`#10380b`), Marigold (`#fce519`), Sage Wash (`#dbe8ac`), Parchment (`#fefde6`), and Vivid Fern (`#30be60`).
+* **Typography:** Oswald (National 2 Condensed display substitute) for compressed poster headlines and Rethink Sans (weights 600-800) for structural UI copy.
+* **Neobrutalist Elevation:** Hard `8px 8px 0 0 #10380b` offset shadows with 40px rounded cards and 1440px pill buttons.
+
+---
+
+## Usage
+
+1. Open `https://rover.novax.my.id`
+2. Enter the destination URL (e.g. `example.com` or `https://staging.domain.com`)
+3. Enter the target server IP address (e.g. `198.51.100.42`)
+4. Click **Explore Site Preview** to browse the site through the tunnel:
+   ```
+   https://rover.novax.my.id/{IP}/{URL}
+   ```
+
+---
+
+## Technical Notes & Limitations
+
+* **Full Page Buffering:** The proxy buffers and parses the entire HTML DOM before rewriting URLs and flushing output.
+* **Client-Side JavaScript:** URLs constructed dynamically in complex client scripts may bypass rewriting and hit the live production site.
+* **Pre-Propagation Tool:** Rover of Nova-X is built as an exploration and migration testing utility, not as a high-traffic production reverse proxy or security boundary.
+* **SSL/TLS:** Connects to remote targets via cURL with SSL verification disabled for self-signed or pre-migration certificates.
+
+---
+
+## License
+
+Distributed under the terms of the **GNU Affero General Public License v3 (AGPL-3.0)**. See `LICENSE` for details.

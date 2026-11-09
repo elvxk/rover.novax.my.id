@@ -1,65 +1,116 @@
-<!--<style>-->
-<!--.preview_block { background-color: #C80000; color: #FFFFFF;-->
-<!--	padding: 2px 5px;-->
-<!--	position: absolute;-->
-<!--	text-align: left;-->
-<!--	left: 5ex;-->
-<!--	top: 5ex;-->
-<!--	width: 320px;-->
-<!--	opacity: 1.00;-->
-<!--	z-index: 9990;-->
-<!--	border-style:solid;-->
-<!--	border-width:1px;-->
-<!--	border-top-color:#EEEEEE;-->
-<!--	border-right-color:#EEEEEE;-->
-<!--	border-left-color:#444444;-->
-<!--	border-bottom-color:#444444;-->
-<!--	-moz-border-radius: 5px;-->
-<!--	border-radius: 5px;-->
-<!--	line-height: 3ex;-->
-<!--}-->
-<!--p.preview_p {	margin: 1em; -->
-<!--        color:#FFFFFF;-->
-<!--	font 10px Verdana, sans-serif, bold;-->
-<!--	font-family: sans-serif;-->
-<!--	font-size: 10px;-->
-<!--	font-weight: bold;-->
-<!--	line-height: 3ex;-->
-<!--}-->
-<!--a.preview_link:link    {color:#FFFFFF; text-decoration: underline; }-->
-<!--a.preview_link:visited {color:#FFFFFF;}-->
-<!--a.preview_link:hover   {color:#A0A0A0;}-->
-<!--a.preview_link:active  {color:#FFFFFF;} -->
-<!--</style>-->
-<!--<div id="preview_banner" class="preview_block"-->
-<!--	onclick="preview_banner_hide()"-->
-<!--	onmouseover="setTimeout('preview_banner_hide()',7500)">-->
-<!--<p class=preview_p>-->
-<!--This <a class=preview_link href="/">Afrihost Preview</a> aims to give you an-->
-<!--idea of what <a class=preview_link href="{$url}">{$domain}</a> will show when-->
-<!--the DNS records are set to {$ip}.-->
-<!--</p><p class=preview_p>-->
-<!--If you see something that resembles your content, then you can go ahead and-->
-<!--update DNS, and not be surprised by database connection errors.  You should see-->
-<!--more or less the same content if you add a line to your browser's hosts file saying:-->
-<!--</p><p class=preview_p style="font-family:fixed">{$ip}  {$hostname}-->
-<!--</p><p class=preview_p>-->
-<!--This box will go away when you click on it, or after a few seconds (if you have-->
-<!--scripting enabled).-->
-<!--</p><p class=preview_p>-->
-<!--<font size=-2>({$changes} tweak{$plural} in {$microtime}s, E&amp;OE.)</font>-->
-<!--</p>-->
-<!--</div>-->
-<!--<script language="Javascript">-->
-<!--    function preview_banner_hide(){-->
-<!--        preview_banner=document.getElementById('preview_banner');-->
-<!--	preview_banner.style.display='none';-->
-<!--	preview_banner.parentNode.removeChild(preview_banner);-->
-<!--    }-->
-<!--    if(parent!=top) {-->
-<!--        setTimeout('preview_banner_hide()',200);-->
-<!--    }-->
-<!--    else {-->
-<!--        setTimeout('preview_banner_hide()',15000);-->
-<!--    }-->
-<!--</script>-->
+<style>
+#rover-preview-toast {
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 24px !important;
+    max-width: 440px !important;
+    width: calc(100vw - 48px) !important;
+    background-color: #fefde6 !important;
+    color: #10380b !important;
+    border: 2px solid #10380b !important;
+    border-radius: 24px !important;
+    box-shadow: 6px 6px 0px 0px #10380b !important;
+    padding: 18px 22px !important;
+    z-index: 2147483647 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    box-sizing: border-box !important;
+    transition: opacity 0.25s ease, transform 0.25s ease !important;
+}
+#rover-preview-toast * {
+    box-sizing: border-box !important;
+}
+.rover-toast-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 10px !important;
+}
+.rover-toast-badge {
+    background-color: #fce519 !important;
+    color: #10380b !important;
+    border: 1.5px solid #10380b !important;
+    border-radius: 9999px !important;
+    padding: 4px 12px !important;
+    font-weight: 800 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+}
+.rover-toast-close {
+    background: none !important;
+    border: 1.5px solid #10380b !important;
+    border-radius: 50% !important;
+    width: 24px !important;
+    height: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    color: #10380b !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}
+.rover-toast-body {
+    margin: 0 0 10px 0 !important;
+    font-size: 14px !important;
+    color: #10380b !important;
+}
+.rover-toast-meta {
+    font-family: monospace !important;
+    background: #dbe8ac !important;
+    border: 1px solid #10380b !important;
+    border-radius: 10px !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    color: #10380b !important;
+    margin-bottom: 10px !important;
+    word-break: break-all !important;
+}
+.rover-toast-stats {
+    font-size: 12px !important;
+    opacity: 0.8 !important;
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+}
+.rover-toast-link {
+    color: #10380b !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+}
+</style>
+<aside id="rover-preview-toast" role="status" aria-live="polite">
+    <div class="rover-toast-header">
+        <span class="rover-toast-badge">Rover of Nova-X Preview</span>
+        <button type="button" class="rover-toast-close" onclick="rover_toast_hide()" aria-label="Dismiss preview notice">&times;</button>
+    </div>
+    <p class="rover-toast-body">
+        Live previewing destination <a class="rover-toast-link" href="{$url}" target="_blank">{$domain}</a> before public DNS switch.
+    </p>
+    <div class="rover-toast-meta">
+        <strong>Host:</strong> {$hostname} &rarr; <strong>IP:</strong> {$ip}
+    </div>
+    <p class="rover-toast-stats">
+        <span>{$changes} link tweak{$plural} in {$microtime}s</span>
+        <span>rover.novax.my.id</span>
+    </p>
+</aside>
+<script>
+function rover_toast_hide() {
+    var t = document.getElementById('rover-preview-toast');
+    if (t) {
+        t.style.opacity = '0';
+        t.style.transform = 'translateY(16px)';
+        setTimeout(function() { if (t && t.parentNode) t.parentNode.removeChild(t); }, 250);
+    }
+}
+if (parent !== top) {
+    setTimeout(rover_toast_hide, 800);
+} else {
+    setTimeout(rover_toast_hide, 12000);
+}
+</script>

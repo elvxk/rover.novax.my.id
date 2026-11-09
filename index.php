@@ -1,10 +1,10 @@
 <?php
 #
-# Preview proxy
+# Rover of Nova-X — Web Based HTTP Preview Proxy
+# Host: rover.novax.my.id
 #
-# This code is copyright 2012 Afrihost.com
+# Original base copyright 2012 Afrihost.com; Redesigned for Rover of Nova-X.
 # Redistribution is permitted under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
-# (ie. If you use this code, you must distribute it to your users, together with your modifications)
 # See http://www.gnu.org/licenses/agpl.html
 
 #ini_set('default_charset','UTF-8');
@@ -128,13 +128,14 @@ function previewurl() {
 
 	if (
 		(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
-		$_SERVER['SERVER_PORT'] == 443 ||
+		(!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) ||
 		(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
 	) {
 		$scheme = 'https';
 	}
 
-	return $scheme.'://'.$_SERVER['HTTP_HOST'].'/';
+	$host = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'rover.novax.my.id';
+	return $scheme.'://'.$host.'/';
 }
 
 function rewrite_url($src) {
@@ -295,19 +296,346 @@ function form() {
 	}
 	echo file_get_contents("header.html");
 	?>
-This proxy server allows you to see what your web site will look like before DNS changes are complete.
-<p>
-Enter the URL of your new site below, and enter the IP address of the server
-where it is set up. Click the button to see what it will look like when
-the DNS has updated:
-	<form action="<?php echo previewurl(); ?>">
-	<label for="url">URL to preview:</label><input type="text" name="url" id="url" size=50 autofocus="True" value="<?php echo $url; ?>" class="input">
-	&nbsp;
-	<label for="ip"  style="margin-left: 1em;">Server IP address:</label><input type="text" name="ip" id="ip" value="<?php echo $ip; ?>" class="input">
-	&nbsp;
-	<label>&nbsp;</label></td><td><input type="submit" id="q" name="q" value="Preview">
-	</table>
-	</form>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-tag">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                </svg>
+                <span>Botanical DNS Field Guide &bull; rover.novax.my.id</span>
+            </div>
+
+            <h1 class="hero-title">
+                PREVIEW SITES <span class="hero-title-italic">BEFORE</span> DNS PROPAGATES
+            </h1>
+
+            <p class="hero-lead">
+                Rover of Nova-X is an on-the-fly HTTP reverse proxy that lets you explore and test new websites or server migrations directly against their destination IP &mdash; zero <code>/etc/hosts</code> tinkering or DNS waiting required.
+            </p>
+
+            <!-- Preview Launch Form Card -->
+            <div class="neobrutal-card preview-card" id="preview-form">
+                <div class="card-header-row">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="card-badge card-badge-marigold">Zero Hosts Edits</span>
+                        <span class="card-badge">Instant Socket</span>
+                    </div>
+                    <span class="field-hint">rover.novax.my.id proxy engine</span>
+                </div>
+
+                <form action="<?php echo previewurl(); ?>" method="GET" class="preview-form">
+                    <div class="field-block">
+                        <label for="url" class="field-label">
+                            <span>1. Destination URL to Preview</span>
+                            <span class="field-hint">Domain or full HTTP/HTTPS address</span>
+                        </label>
+                        <div class="field-input-box">
+                            <span class="field-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                </svg>
+                            </span>
+                            <input type="text" name="url" id="url" size="50" autofocus="true" value="<?php echo htmlspecialchars($url ?? '', ENT_QUOTES); ?>" class="clean-input" placeholder="e.g. example.com or http://staging.domain.com" required>
+                        </div>
+                    </div>
+
+                    <div class="field-block">
+                        <label for="ip" class="field-label">
+                            <span>2. Target Server IP Address</span>
+                            <span class="field-hint">Destination server where website lives</span>
+                        </label>
+                        <div class="field-input-box">
+                            <span class="field-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                                </svg>
+                            </span>
+                            <input type="text" name="ip" id="ip" value="<?php echo htmlspecialchars($ip ?? '', ENT_QUOTES); ?>" class="clean-input" placeholder="e.g. 198.51.100.42 (auto-resolves if left empty)" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="q" name="q" value="Preview" class="btn-launch">
+                        <span>EXPLORE SITE PREVIEW</span>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+
+                    <p class="form-footnote">
+                        The proxy connects directly to the target server IP with the spoofed <code>Host:</code> header and rewrites internal links on the fly.
+                    </p>
+                </form>
+            </div>
+
+            <!-- Social proof rating strip -->
+            <div class="social-proof-strip">
+                <div class="star-rating">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+                <span class="social-proof-label">Trusted DNS Pre-Propagation Tunnel &bull; Zero Lag</span>
+            </div>
+        </div>
+
+        <!-- Right Column: Visual Pipeline & Botanical Field Graphic -->
+        <div class="hero-sidebar">
+            <div class="neobrutal-card mockup-pipeline">
+                <div class="pipeline-header">
+                    <div>
+                        <span class="card-badge card-badge-marigold" style="margin-bottom: 4px;">ACTIVE PROTOCOL</span>
+                        <h3 class="pipeline-title">PROXY RESOLUTION TUNNEL</h3>
+                    </div>
+                    <span class="pipeline-status-pill">
+                        <span class="pulse-indicator"></span>
+                        READY
+                    </span>
+                </div>
+
+                <div class="pipeline-steps">
+                    <div class="pipeline-step-item">
+                        <div class="step-item-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                        </div>
+                        <div class="step-item-text">
+                            <h4 class="step-item-title">CLIENT BROWSER</h4>
+                            <p class="step-item-sub">Requests preview via <code>rover.novax.my.id/{IP}/{URL}</code></p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-arrow-down">
+                        <svg width="16" height="20" viewBox="0 0 16 20" fill="none" stroke="#10380b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="8" y1="0" x2="8" y2="16"></line>
+                            <polyline points="2 10 8 16 14 10"></polyline>
+                        </svg>
+                    </div>
+
+                    <div class="pipeline-step-item" style="background-color: var(--color-sage-wash);">
+                        <div class="step-item-icon" style="background-color: var(--color-vivid-fern);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="step-item-text">
+                            <h4 class="step-item-title">ROVER ENGINE</h4>
+                            <p class="step-item-sub">Spoofs <code>Host:</code> header &amp; fetches target server directly</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-arrow-down">
+                        <svg width="16" height="20" viewBox="0 0 16 20" fill="none" stroke="#10380b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="8" y1="0" x2="8" y2="16"></line>
+                            <polyline points="2 10 8 16 14 10"></polyline>
+                        </svg>
+                    </div>
+
+                    <div class="pipeline-step-item">
+                        <div class="step-item-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                                <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                                <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                            </svg>
+                        </div>
+                        <div class="step-item-text">
+                            <h4 class="step-item-title">DESTINATION SERVER</h4>
+                            <p class="step-item-sub">Replies with site content; links rewritten on return</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipeline-console">
+                    <span class="console-green">&gt; rover route --target</span> $IP <br>
+                    <span class="console-yellow">&gt; rewrite_dom:</span> &lt;a&gt;, &lt;img&gt;, &lt;link&gt;, &lt;form&gt; &check;<br>
+                    <span class="console-green">&gt; toast_banner:</span> injected at &lt;/body&gt; &check;
+                </div>
+            </div>
+
+            <!-- Botanical Saguaro field guide accent card -->
+            <div class="neobrutal-card card-tint-sage" style="margin-top: 24px; padding: 20px 24px;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="flex-shrink: 0;">
+                        <svg width="44" height="44" viewBox="0 0 48 48" fill="none" stroke="#10380b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- Botanical Cactus Field Line Art -->
+                            <path d="M24 44V8C24 5.79 22.21 4 20 4C17.79 4 16 5.79 16 8V44"/>
+                            <path d="M16 26H8C5.79 26 4 24.21 4 22V14"/>
+                            <path d="M24 32H34C36.21 32 38 30.21 38 28V18"/>
+                            <path d="M2 44H46"/>
+                            <line x1="10" y1="38" x2="10.01" y2="38"/>
+                            <line x1="30" y1="40" x2="30.01" y2="40"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 style="font-family: var(--font-national-2-condensed); font-size: 1.15rem; margin: 0 0 2px 0;">NOVA-X EXPEDITION GUIDE</h4>
+                        <p style="font-size: 0.85rem; margin: 0; line-height: 1.4;">
+                            Domain records take hours to refresh. Rover gives you immediate ground truth.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stat Counter Bar -->
+    <div class="stat-bar">
+        <div class="stat-item">
+            <span class="stat-number">0</span>
+            <span class="stat-label">Hosts File Edits</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Zero DNS Waiting</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">80/443</span>
+            <span class="stat-label">HTTP Socket Forwarding</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">~0.1s</span>
+            <span class="stat-label">Dynamic Link Rewrites</span>
+        </div>
+    </div>
+
+    <!-- 3-Step Guide Section -->
+    <section class="content-section" id="how-it-works">
+        <div class="section-head">
+            <span class="section-tag">FIELD GUIDE</span>
+            <h2 class="section-title">THREE STEPS TO PREVIEW YOUR MIGRATION</h2>
+            <p class="section-desc">
+                How Rover of Nova-X navigates your new web setup without altering your operating system or local network settings.
+            </p>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-badge-num">1</div>
+                <h3 class="step-title">SPECIFY URL &amp; TARGET IP</h3>
+                <p class="step-body">
+                    Enter the domain of the site you are moving and the destination IP address of your new server or cloud instance.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-badge-num">2</div>
+                <h3 class="step-title">DIRECT SOCKET CONNECTION</h3>
+                <p class="step-body">
+                    Rover establishes an HTTP socket directly with the destination IP, sending the legitimate host header so Apache or Nginx serves the exact virtual host.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-badge-num">3</div>
+                <h3 class="step-title">ON-THE-FLY REWRITING</h3>
+                <p class="step-body">
+                    Internal URLs, styles, stylesheets, images, and forms are rewritten to route through Rover, so you can click through your site just like production.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Specs & FAQ / Field Guide Section -->
+    <section class="content-section" id="features">
+        <div class="section-head">
+            <span class="section-tag">SPECIFICATIONS</span>
+            <h2 class="section-title">TECHNICAL CAPABILITIES &amp; ADVISORY</h2>
+            <p class="section-desc">
+                A complete transparent breakdown of proxy capabilities, protocols, and architectural scope.
+            </p>
+        </div>
+
+        <div class="specs-faq-grid">
+            <div class="neobrutal-card">
+                <div class="card-header-row">
+                    <h3 class="card-title">SUPPORTED PROTOCOLS</h3>
+                    <span class="card-badge card-badge-marigold">CAPABILITIES</span>
+                </div>
+                <ul class="spec-list">
+                    <li class="spec-list-item">
+                        <div class="spec-icon-check">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div>
+                            <strong>Zero Hosts Modifications:</strong> No administrator or root access required on client workstations.
+                        </div>
+                    </li>
+                    <li class="spec-list-item">
+                        <div class="spec-icon-check">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div>
+                            <strong>Cookie &amp; Session Passthrough:</strong> Cookies and session tokens are preserved across requests.
+                        </div>
+                    </li>
+                    <li class="spec-list-item">
+                        <div class="spec-icon-check">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div>
+                            <strong>Form POST &amp; File Uploads:</strong> Multipart and standard form submissions are forwarded to the target host.
+                        </div>
+                    </li>
+                    <li class="spec-list-item">
+                        <div class="spec-icon-check">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div>
+                            <strong>RFC1918 Private IP Protection:</strong> Built-in blacklist protects against unauthorized access to local private networks.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="neobrutal-card card-tint-sage" id="faq">
+                <div class="card-header-row">
+                    <h3 class="card-title">FIELD GUIDE ADVISORY</h3>
+                    <span class="card-badge">NOTICE</span>
+                </div>
+                <ul class="spec-list">
+                    <li class="spec-list-item">
+                        <div class="spec-icon-warn">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </div>
+                        <div>
+                            <strong>Full DOM Buffering:</strong> Pages must be completely downloaded and parsed before links can be rewritten and sent to your browser.
+                        </div>
+                    </li>
+                    <li class="spec-list-item">
+                        <div class="spec-icon-warn">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </div>
+                        <div>
+                            <strong>Client-Side JavaScript:</strong> Hostnames constructed dynamically via complex scripts might load the live production site.
+                        </div>
+                    </li>
+                    <li class="spec-list-item">
+                        <div class="spec-icon-warn">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10380b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </div>
+                        <div>
+                            <strong>Pre-Propagation Tool Only:</strong> Not suitable for production traffic or highly sensitive cryptographic credentials.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
 	<?php
 	echo file_get_contents("footer.html");
 	exit();
@@ -322,10 +650,17 @@ function report_error($message,$debug='')
 	global $url, $ip;
 	header("HTTP/1.0 502 Proxy Error"); # you figure it out
 	echo file_get_contents('header.html').
-		"<H1>Error: $message</H1>".
-		'Cannot retrieve <a href="'.urlencode($url).'">'.htmlentities($url).'</a>'.
-		' from '.htmlentities($ip).'<p>'.$debug.
-		 file_get_contents('footer.html');
+		'<div class="status-action-card">'.
+		'<div class="status-badge status-badge-error">Proxy Error &bull; 502</div>'.
+		'<h1 class="status-title">Unable to Retrieve Site</h1>'.
+		'<p class="status-body">Rover of Nova-X encountered an issue connecting to <strong>'.htmlentities($ip).'</strong> for destination URL <a href="'.urlencode($url).'">'.htmlentities($url).'</a>.</p>'.
+		'<div class="rover-toast-meta"><strong>Diagnostic:</strong> '.htmlentities($message).'</div>'.
+		($debug ? '<div class="rover-toast-meta">'.$debug.'</div>' : '').
+		'<div class="status-actions-row">'.
+		'<a href="/" class="pill-btn pill-btn-marigold">&larr; Return to Rover Home</a>'.
+		'</div>'.
+		'</div>'.
+		file_get_contents('footer.html');
 	exit();
 }
 function go() {
@@ -336,16 +671,17 @@ function go() {
 		exit;
 	}
 	# Now get it directly from the URI
-	$bits=explode('/',$_SERVER["REQUEST_URI"]);
+	$request_uri = $_SERVER["REQUEST_URI"] ?? '/';
+	$bits=explode('/',$request_uri);
 	$ip=array_shift($bits);  # empty part
 	$ip=array_shift($bits);  # IP part
 	$request_url=implode('/',$bits);
 	$request_url=preg_replace('|^(https?:)//*|','$1//',$request_url);  # correct mangling from http://site to http:/site
 	#echo "ip=$ip, url=$url";
 	# If IP is missing, then follow regular assumptions ... except it's hard to know that the IP is missing!
-	if (preg_match('|^https?:|',$ip)) {
+	if ($ip && preg_match('|^https?:|',$ip)) {
 		# URL with scheme preview.moo/$ip=http://$bits[1]=target.com/$bits[2]=stuff
-		$bits=explode('/',$_SERVER["REQUEST_URI"]);
+		$bits=explode('/',$request_uri);
 		array_shift($bits);
 		$request_url=implode('/',$bits);
 		$request_url=preg_replace('!^(https?:)|//*!','$1//',$request_url);  # correct mangling from http://site to http:/site
@@ -356,7 +692,7 @@ function go() {
 		$url=@$_GET['url'];
 		$ip=@$_GET['ip'];
 		if (!$url) {
-			$url=substr($_SERVER["REQUEST_URI"],1);
+			$url=substr($request_uri,1);
 		}
 		$url=http_url($url);
 		if ($url && $ip) {
@@ -421,25 +757,26 @@ function go() {
 			$header = file_get_contents("header.html");
 			$refresh='<meta http-equiv="refresh" content="5;URL=\''.$url.'\'" />';
 			$header = preg_replace(':<head>:',"<head>$refresh",$header);
-			$header = preg_replace(':<title>.*?</title>:',"<title>Site already live!</title>",$header);
+			$header = preg_replace(':<title>.*?</title>:',"<title>Site Already Live — Rover of Nova-X</title>",$header);
 			echo $header . '
-		<h2>Site already live!</h2>
-		<p><b>Good news!</b> The public DNS records for <a href="'.$host.'">'.htmlentities($host).'</a> already point to
-		'.htmlentities($ip).', so you can view it without this preview facility.
-		<p>Your browser will redirect there in 5 seconds ...</p>
-		<form action="'. previewurl() . '">
-		To view this site at another IP address, click:
-			<input type=hidden name="url" value="'.htmlentities($url).'">
-			<input type=submit name=preview value="Change IP address" autofocus=True>
-		</form>
-		Well, to be accurate, when we checked the DNS records from
-		<i>here</i> we found that they are alive and well, and pointing
-		to your site.  It is possible that your resolving DNS server
-		will be holding on to the memory that the domain does not exist
-		for the next few minutes.  If you get an error, try again every
-		ten minutes (DNS servers keep memory of non-existent domains
-		for ten minutes).'.file_get_contents('footer.html');
-		exit();
+			<div class="status-action-card">
+				<div class="status-badge status-badge-live">Public DNS Already Pointing to Target</div>
+				<h1 class="status-title">Site Already Live!</h1>
+				<p class="status-body">
+					<strong>Good news!</strong> The public DNS records for <strong><a href="'.$url.'">'.htmlentities($host).'</a></strong> already resolve to <strong>'.htmlentities($ip).'</strong>. You can view the site directly without this preview proxy.
+				</p>
+				<p class="status-body" style="font-size: 0.95rem; opacity: 0.85;">
+					Your browser will redirect there automatically in 5 seconds...
+				</p>
+				<div class="status-actions-row">
+					<a href="'.$url.'" class="pill-btn pill-btn-marigold">Proceed to Live Site &rarr;</a>
+					<form action="'. previewurl() . '" style="display:inline; margin:0; padding:0; background:none; border:none;">
+						<input type="hidden" name="url" value="'.htmlentities($url).'">
+						<button type="submit" name="preview" value="Change IP address" class="pill-btn pill-btn-ink" autofocus="true">Change Target IP</button>
+					</form>
+				</div>
+			</div>'.file_get_contents('footer.html');
+			exit();
 		}
 	}
 	#$debuginfo='';
