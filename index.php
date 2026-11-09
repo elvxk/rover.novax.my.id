@@ -619,10 +619,11 @@ function http_url($url) {
 function report_error($message,$debug='')
 {
 	global $url, $ip;
-	header("HTTP/1.0 502 Proxy Error"); # you figure it out
+	// Use 200 OK so Cloudflare proxy does not intercept this page with generic 502
+	http_response_code(200);
 	echo file_get_contents('header.html').
 		'<div class="status-action-card">'.
-		'<div class="status-badge status-badge-error">Proxy Error &bull; 502</div>'.
+		'<div class="status-badge status-badge-error">Proxy Notice</div>'.
 		'<h1 class="status-title">Unable to Retrieve Site</h1>'.
 		'<p class="status-body">Rover of Nova-X encountered an issue connecting to <strong>'.htmlentities($ip).'</strong> for destination URL <a href="'.urlencode($url).'">'.htmlentities($url).'</a>.</p>'.
 		'<div class="rover-toast-meta"><strong>Diagnostic:</strong> '.htmlentities($message).'</div>'.
@@ -754,25 +755,29 @@ function go() {
 			exit();
 		}
 	}
-	#$debuginfo='';
-	#$debuginfo.="<br>Host: $host";
+	$scheme = $parse_url['scheme'] ?? 'http';
+	$port = isset($parse_url['port']) ? (int)$parse_url['port'] : ($scheme === 'https' ? 443 : 80);
+
 	$request_headers = array('Host: '.$host);
 	$request_headers[] = 'X-Preview: 1';
-	$curl_url = preg_replace("/$host/i",$ip,$url,1);
-	# error_log("host=$host, ip=$ip, $url => $curl_url");
-	curl_setopt($curl, CURLOPT_URL, $curl_url); # fixme: errors if you embed the IP in the URL
-	#$debuginfo.="<br>curl_url: $curl_url";
+
+	// Resolve destination host to target IP directly while preserving real hostname for SNI & vhosts
+	curl_setopt($curl, CURLOPT_RESOLVE, array("{$host}:{$port}:{$ip}"));
+	curl_setopt($curl, CURLOPT_URL, $url);
+
 	foreach (apache_request_headers() as $browser_header=>$browser_value) {
+		// Strip Cloudflare proxy and reverse-proxy forwarded headers to prevent WAF / edge conflicts on target
+		if (preg_match('/^(cf-|x-forwarded-|x-real-ip)/i', $browser_header)) continue;
 		if (preg_match('/^(X-|Accept$|DNT|Cache-Control|Accept-Language|Authorization|If-Modified-Since)/i',$browser_header)) {
 			$request_headers[]=$browser_header.': '.$browser_value;
 		}
 	}
 	curl_setopt($curl, CURLOPT_HTTPHEADER, $request_headers);
-	#$debuginfo.="<br>request_headers: ".implode('; ',$request_headers);
-	curl_setopt($curl, CURLOPT_USERAGENT, @$_SERVER['HTTP_USER_AGENT']);
+	curl_setopt($curl, CURLOPT_USERAGENT, @$_SERVER['HTTP_USER_AGENT'] ?: 'Mozilla/5.0 Rover/Nova-X');
 	curl_setopt($curl, CURLOPT_HEADER, true);
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($curl, CURLOPT_CONNECTTIMEOUT,180);
+	curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 15);
+	curl_setopt($curl, CURLOPT_TIMEOUT, 45);
 	curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
 	curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
 	#echo "_COOKIE::"; print_r($_COOKIE);
@@ -860,7 +865,12 @@ function go() {
 
 	$content_type = $info['content_type'];
 	if ($http_response_code) {
-		header($http_response_code);
+		// Prevent Cloudflare from intercepting upstream 502/503/504 and replacing the body
+		if (preg_match('/50[234]/', $http_response_code)) {
+			header('HTTP/1.1 200 OK');
+		} else {
+			header($http_response_code);
+		}
 	}
 	header('Content-Type: '.$content_type);
 	foreach (explode("\n",$reply_headers) as $reply_header) {
