@@ -668,7 +668,11 @@ function go() {
 		$url=http_url($url);
 		if ($url && $ip) {
 			if (preg_match('/[a-z]/i',$ip)) {
-				$ip=gethostbyname($ip);
+				$resolved = gethostbyname($ip);
+				if ($resolved === $ip) {
+					report_error('Cannot resolve hostname: '.htmlentities($ip), 'Please verify the hostname spelling or enter the direct server IP address.');
+				}
+				$ip = $resolved;
 			}
 			$newurl = previewurl(). $ip.'/'.$url; # myurlencode here .. was ..
 			header("Location: $newurl");
