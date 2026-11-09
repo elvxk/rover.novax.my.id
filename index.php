@@ -305,6 +305,16 @@ function form() {
 			$url = '';
 		}
 	}
+	$server_error = '';
+	if (isset($_GET['q']) || isset($_GET['preview'])) {
+		if (empty($url) && empty($ip)) {
+			$server_error = 'Please fill out this field: Destination URL and Target IP are required.';
+		} elseif (empty($url)) {
+			$server_error = 'Please fill out this field: Destination URL is required.';
+		} elseif (empty($ip)) {
+			$server_error = 'Please fill out this field: Target Server IP is required.';
+		}
+	}
 	echo file_get_contents("header.html");
 	?>
     <!-- Hero Spotlight Section -->
@@ -336,7 +346,22 @@ function form() {
                     <span class="field-hint">rover.novax.my.id proxy engine</span>
                 </div>
 
-                <form action="<?php echo previewurl(); ?>" method="GET" class="spotlight-form">
+                <form action="<?php echo previewurl(); ?>" method="GET" class="spotlight-form" id="spotlight-form" novalidate>
+                    <!-- Custom Spotlight Alert -->
+                    <div class="spotlight-alert" id="spotlight-alert" role="alert" aria-live="assertive"<?php echo empty($server_error) ? ' hidden' : ''; ?>>
+                        <span class="spotlight-alert-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </span>
+                        <div class="spotlight-alert-content">
+                            <span class="spotlight-alert-badge">Notice</span>
+                            <span class="spotlight-alert-message" id="spotlight-alert-text"><?php echo htmlspecialchars($server_error ?: 'Please fill out this field to continue.', ENT_QUOTES); ?></span>
+                        </div>
+                        <button type="button" class="spotlight-alert-close" id="spotlight-alert-close" aria-label="Dismiss alert">&times;</button>
+                    </div>
                     <div class="spotlight-fields-row">
                         <div class="field-block field-url">
                             <label for="url" class="field-label">
@@ -617,6 +642,86 @@ function form() {
                 </ul>
             </div>
         </div>
+        <script>
+        (function() {
+            var form = document.getElementById('spotlight-form');
+            if (!form) return;
+
+            var urlInput = document.getElementById('url');
+            var ipInput = document.getElementById('ip');
+            var alertBox = document.getElementById('spotlight-alert');
+            var alertText = document.getElementById('spotlight-alert-text');
+            var alertClose = document.getElementById('spotlight-alert-close');
+
+            function showAlert(message, targetInput) {
+                if (alertText) alertText.textContent = message;
+                if (alertBox) {
+                    alertBox.hidden = false;
+                    alertBox.style.animation = 'none';
+                    void alertBox.offsetWidth;
+                    alertBox.style.animation = '';
+                }
+                if (targetInput) {
+                    targetInput.classList.remove('has-error', 'shake-anim');
+                    void targetInput.offsetWidth;
+                    targetInput.classList.add('has-error', 'shake-anim');
+                    targetInput.focus();
+                }
+            }
+
+            function hideAlert() {
+                if (alertBox && !alertBox.hidden) {
+                    alertBox.hidden = true;
+                }
+            }
+
+            if (alertClose) {
+                alertClose.addEventListener('click', hideAlert);
+            }
+
+            [urlInput, ipInput].forEach(function(input) {
+                if (!input) return;
+                input.addEventListener('input', function() {
+                    if (this.value.trim().length > 0) {
+                        this.classList.remove('has-error', 'shake-anim');
+                        var urlFilled = urlInput && urlInput.value.trim().length > 0;
+                        var ipFilled = ipInput && ipInput.value.trim().length > 0;
+                        if (urlFilled && ipFilled) {
+                            hideAlert();
+                        }
+                    }
+                });
+            });
+
+            form.addEventListener('submit', function(e) {
+                var urlVal = urlInput ? urlInput.value.trim() : '';
+                var ipVal = ipInput ? ipInput.value.trim() : '';
+
+                if (!urlVal && !ipVal) {
+                    e.preventDefault();
+                    showAlert('Please fill out this field: Destination URL and Target IP are required.', urlInput);
+                    if (ipInput) {
+                        ipInput.classList.remove('has-error', 'shake-anim');
+                        void ipInput.offsetWidth;
+                        ipInput.classList.add('has-error', 'shake-anim');
+                    }
+                    return false;
+                }
+
+                if (!urlVal) {
+                    e.preventDefault();
+                    showAlert('Please fill out this field: Destination URL is required.', urlInput);
+                    return false;
+                }
+
+                if (!ipVal) {
+                    e.preventDefault();
+                    showAlert('Please fill out this field: Target Server IP is required.', ipInput);
+                    return false;
+                }
+            });
+        })();
+        </script>
     </section>
 	<?php
 	echo file_get_contents("footer.html");
