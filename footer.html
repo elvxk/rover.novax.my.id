@@ -1,55 +1,17 @@
 <!-- /cut/ -->
     </main>
 
-    <!-- Botanical Almanac Footer -->
+    <!-- Simple Minimal Footer -->
     <footer class="site-footer">
-        <div class="footer-container">
-            <div class="footer-brand-col">
-                <div class="brand-group">
-                    <div class="brand-symbol">
-                        <svg width="28" height="28" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="18" cy="18" r="16" fill="#fce519" stroke="#10380b" stroke-width="2"/>
-                            <path d="M18 6 L22 18 L18 15 L14 18 Z" fill="#10380b"/>
-                            <path d="M18 30 L14 18 L18 21 L22 18 Z" fill="#30be60"/>
-                            <circle cx="18" cy="18" r="2.5" fill="#f2ee98" stroke="#10380b" stroke-width="1.5"/>
-                        </svg>
-                    </div>
-                    <div class="brand-text-block">
-                        <span class="brand-title">ROVER <span class="brand-of">of</span> NOVA-X</span>
-                        <span class="brand-subtitle">rover.novax.my.id</span>
-                    </div>
-                </div>
-                <p class="footer-tagline">
-                    Sunlit retro botanical proxy engine for site testing &amp; DNS migration. Zero /etc/hosts modifications.
-                </p>
-            </div>
-
-            <div class="footer-nav-col">
-                <span class="footer-heading">NAVIGATION</span>
-                <ul class="footer-links">
-                    <li><a href="#preview-form">Launch Preview</a></li>
-                    <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#features">Technical Specs</a></li>
-                    <li><a href="#faq">Field Guide / FAQ</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-nav-col">
-                <span class="footer-heading">PROTOCOL</span>
-                <ul class="footer-links">
-                    <li><span class="pill-badge pill-badge-ink">HTTP Socket</span></li>
-                    <li><span class="pill-badge pill-badge-marigold">On-the-fly Rewrites</span></li>
-                    <li><span class="pill-badge pill-badge-ink">RFC1918 Guard</span></li>
-                </ul>
-            </div>
+        <div class="footer-simple-inner">
+            <p>&copy; <span id="footer-year">2026</span> Rover of <a href="https://novax.my.id" target="_blank" rel="noopener noreferrer">Nova-X</a> by <a href="https://pradipta.dev" target="_blank" rel="noopener noreferrer">elvxk</a> &middot; made with love</p>
         </div>
-
-        <div class="footer-bottom">
-            <div class="footer-bottom-inner">
-                <p>&copy; Rover of Nova-X &bull; Licensed under GNU AGPLv3 &bull; Running on <strong>rover.novax.my.id</strong></p>
-                <p class="footer-stamp">SUNLIT RETRO BOTANICAL ALMANAC EDITION</p>
-            </div>
-        </div>
+        <script>
+            (function() {
+                var y = document.getElementById('footer-year');
+                if (y) y.textContent = new Date().getFullYear();
+            })();
+        </script>
     </footer>
 </div>
 </body>
