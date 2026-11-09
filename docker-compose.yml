@@ -1,0 +1,9 @@
+services:
+  rover:
+    build: .
+    container_name: rover-novax
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:2015:80"
+    environment:
+      - VIRTUAL_HOST=rover.novax.my.id
