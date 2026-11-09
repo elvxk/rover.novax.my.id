@@ -1,0 +1,58 @@
+when:
+  - event: push
+    branch: main
+
+steps:
+  - name: deploy
+    image: appleboy/drone-ssh
+    settings:
+      host:
+        from_secret: vps_host
+      username:
+        from_secret: vps_user
+      key:
+        from_secret: vps_ssh_key
+      port:
+        from_secret: vps_port
+
+      command_timeout: 15m
+      script_stop: true
+
+      envs:
+        - REPO_URL
+        - PROJECT_NAME
+        - DEPLOY_PATH
+
+      script:
+        # Git configuration
+        - |
+          set -e
+
+          mkdir -p "$DEPLOY_PATH"
+          cd "$DEPLOY_PATH"
+
+          # Clone repository jika belum tersedia
+          if [ ! -d "$PROJECT_NAME/.git" ]; then
+            git clone "$REPO_URL" "$PROJECT_NAME"
+          fi
+
+          cd "$PROJECT_NAME"
+
+          # Update source code
+          git fetch origin main
+          git reset --hard origin/main
+
+          # Validate Docker Compose configuration
+          docker compose config -q
+
+          # Build dan deploy
+          docker compose up -d --build --remove-orphans
+
+          # Tampilkan status container
+          docker compose ps
+
+    environment:
+      REPO_URL: git@github.com:elvxk/rover.novax.my.id.git
+      PROJECT_NAME: rover.novax.my.id
+      DEPLOY_PATH:
+        from_secret: deploy_path
