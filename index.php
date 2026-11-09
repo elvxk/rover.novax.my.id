@@ -7,6 +7,12 @@
 # Redistribution is permitted under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
 # See http://www.gnu.org/licenses/agpl.html
 
+// Disable visible errors/warnings on screen; log to background error log only
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
+
 #ini_set('default_charset','UTF-8');
 # Don't squeak on bad html
 function get_execution_time()
@@ -77,32 +83,32 @@ if( !function_exists('apache_request_headers') ) {
 // 	return $matches[1];
 // }
 function dns_lookup($hostname) {
-    if (!$hostname) {
+    if (!$hostname || strpos($hostname, '.') === false) {
         return '';
     }
 
     // Jika tidak ada preferred DNS
     if (!PreviewConfig::PREFERRED_DNS) {
-        $ip = gethostbyname($hostname);
+        $ip = @gethostbyname($hostname);
 
-        if (PreviewConfig::CHECK_WILDCARD && $ip == gethostbyname("wildcardcheck")) {
+        if (PreviewConfig::CHECK_WILDCARD && $ip == @gethostbyname("wildcardcheck")) {
             return '';
         }
 
-        return $ip;
+        return ($ip && $ip !== $hostname) ? $ip : '';
     }
 
-    // Query DNS menggunakan dns_get_record
-    $records = dns_get_record($hostname, DNS_A);
+    // Query DNS menggunakan dns_get_record tanpa memicu PHP warning
+    $records = @dns_get_record($hostname, DNS_A);
 
     if (!$records || !isset($records[0]['ip'])) {
-        $ip = gethostbyname($hostname);
+        $ip = @gethostbyname($hostname);
 
-        if (PreviewConfig::CHECK_WILDCARD && $ip == gethostbyname("wildcardcheck")) {
+        if (PreviewConfig::CHECK_WILDCARD && $ip == @gethostbyname("wildcardcheck")) {
             return '';
         }
 
-        return $ip;
+        return ($ip && $ip !== $hostname) ? $ip : '';
     }
 
     return $records[0]['ip'];
@@ -292,7 +298,12 @@ function form() {
 	global $ip;
 	if ($url && !$ip) {
 		$parse_url = parse_url($url);
-		$ip=dns_lookup($parse_url['host']);
+		$host = $parse_url['host'] ?? '';
+		if ($host && strpos($host, '.') !== false) {
+			$ip = dns_lookup($host);
+		} else {
+			$url = '';
+		}
 	}
 	echo file_get_contents("header.html");
 	?>
